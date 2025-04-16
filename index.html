@@ -3,228 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMING SOON</title>
+    <title>My Project</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background-color: #000;
-            color: #fff;
-            font-family: 'Share Tech Mono', monospace;
-            overflow: hidden;
-            cursor: none;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #121212;
+            color: #e0e0e0;
         }
         
         .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        a {
+            display: inline-block;
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
             position: relative;
+            transition: color 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease forwards 0.3s;
         }
         
-        .text {
-            font-size: 7vw;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1.2vw;
-            position: relative;
-            z-index: 10;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-        }
-        
-        .counter {
-            position: fixed;
-            bottom: 20px;
-            font-size: 3vw;
-            z-index: 10;
-            opacity: 0.7;
-        }
-        
-        .player {
+        a::after {
+            content: '';
             position: absolute;
-            width: 16px;
-            height: 16px;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 20px #fff;
-            z-index: 100;
-            pointer-events: none;
+            width: 100%;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #60a5fa;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease;
         }
         
-        .dot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #fff;
-            z-index: 5;
-            animation: pulse 2s infinite;
+        a:hover {
+            color: #93c5fd;
         }
         
-        @keyframes pulse {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            100% { opacity: 0.3; }
+        a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            a {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="text">COMING SOON</div>
-        <div class="counter" id="counter">0</div>
-        <div class="player" id="player"></div>
+        <h1>My most recent project &rarr; TimeSlate.app</h1>
+        <a href="https://timeslate.app" target="_blank">TimeSlate.app</a>
     </div>
-
-    <script>
-        // Game state
-        const state = {
-            score: 0,
-            dots: [],
-            maxDots: 15,
-            lastTime: 0,
-            spawnInterval: 1000, // ms between spawning dots
-            lastSpawn: 0
-        };
-        
-        // DOM elements
-        const container = document.querySelector('.container');
-        const counterElement = document.getElementById('counter');
-        const player = document.getElementById('player');
-        
-        // Screen dimensions
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        
-        // Track mouse position
-        let mouseX = width / 2;
-        let mouseY = height / 2;
-        
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            // Update player position
-            player.style.left = `${mouseX - 8}px`;
-            player.style.top = `${mouseY - 8}px`;
-        });
-        
-        // Spawn a dot at random position
-        function spawnDot() {
-            // Don't spawn too many dots
-            if (state.dots.length >= state.maxDots) return;
-            
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            
-            // Random position, but keep away from edges
-            const padding = 50;
-            const x = padding + Math.random() * (width - padding * 2);
-            const y = padding + Math.random() * (height - padding * 2);
-            
-            dot.style.left = `${x}px`;
-            dot.style.top = `${y}px`;
-            
-            // Random animation delay
-            dot.style.animationDelay = `${Math.random()}s`;
-            
-            document.body.appendChild(dot);
-            
-            // Add to game state
-            state.dots.push({
-                element: dot,
-                x: x,
-                y: y,
-                collected: false
-            });
-        }
-        
-        // Check if player collects dots
-        function checkCollisions() {
-            const playerRadius = 8;
-            const dotRadius = 4;
-            const collisionDistance = playerRadius + dotRadius;
-            
-            state.dots.forEach(dot => {
-                if (dot.collected) return;
-                
-                const dx = mouseX - dot.x;
-                const dy = mouseY - dot.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < collisionDistance) {
-                    collectDot(dot);
-                }
-            });
-        }
-        
-        // Collect a dot
-        function collectDot(dot) {
-            dot.collected = true;
-            dot.element.style.animation = 'none';
-            dot.element.style.opacity = '0';
-            dot.element.style.transform = 'scale(2)';
-            dot.element.style.transition = 'all 0.3s';
-            
-            // Remove after animation
-            setTimeout(() => {
-                dot.element.remove();
-                // Remove from array
-                const index = state.dots.findIndex(d => d === dot);
-                if (index !== -1) {
-                    state.dots.splice(index, 1);
-                }
-            }, 300);
-            
-            // Update score
-            state.score += 1;
-            counterElement.textContent = state.score;
-            
-            // Score animation
-            counterElement.style.opacity = '1';
-            counterElement.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                counterElement.style.opacity = '0.7';
-                counterElement.style.transform = 'scale(1)';
-            }, 200);
-            
-            // Make game harder as score increases
-            if (state.score % 10 === 0) {
-                state.spawnInterval = Math.max(200, state.spawnInterval - 100);
-            }
-        }
-        
-        // Game loop
-        function gameLoop(timestamp) {
-            if (!state.lastTime) state.lastTime = timestamp;
-            const elapsed = timestamp - state.lastTime;
-            state.lastTime = timestamp;
-            
-            // Check if it's time to spawn a new dot
-            if (timestamp - state.lastSpawn > state.spawnInterval) {
-                spawnDot();
-                state.lastSpawn = timestamp;
-            }
-            
-            // Check for collisions
-            checkCollisions();
-            
-            // Continue the game loop
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // Start the game
-        requestAnimationFrame(gameLoop);
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            location.reload();
-        });
-    </script>
 </body>
-</html>
+</html> 
